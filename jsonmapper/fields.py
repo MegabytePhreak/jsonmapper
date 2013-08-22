@@ -32,6 +32,9 @@ class Field(object):
         self.validate(source)
         return source
 
+    def json_encode(self, value):
+        return value
+
 
 class NumericField(Field):
 
@@ -51,7 +54,6 @@ class NumericField(Field):
     def check_numeric(value):
         if not isinstance(value, numbers.Number):
             raise ValidationError("Value '%s' is not numeric" % repr(value))
-
 
     def check_max_val(self, value):
         if value > self.max_val:
@@ -111,7 +113,6 @@ class StringField(SequenceField):
         if not isinstance(value, allowed_types):
             raise ValidationError('Value %s is not a string' % repr(value))
 
-
 class ArrayField(SequenceField):
 
     def __init__(self, field_type, *args, **kwargs):
@@ -128,6 +129,9 @@ class ArrayField(SequenceField):
     def validate_items(self, value):
         for item in value:
             self.field_type.validate(item)
+
+    def json_encode(self, value):
+        return [self.field_type.json_encode(item) for item in value]
 
 
 class DictField(SequenceField):
@@ -147,6 +151,9 @@ class DictField(SequenceField):
         for key, item in value.items():
             self.field_type.validate(item)
 
+    def json_encode(self, value):
+        return {key: self.field_type.json_encode(item) for (key, item) in value.items()}
+
 
 class ObjectField(Field):
 
@@ -164,5 +171,7 @@ class ObjectField(Field):
 
     def load(self, value):
         value = self.object_type.load(value)
-        self.validate(value)
         return value
+
+    def json_encode(self, value):
+        return value.json_equivalent()

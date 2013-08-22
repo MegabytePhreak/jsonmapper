@@ -84,6 +84,15 @@ class Loadable(object):
 
         return cls(**fields)
 
+    def json_equivalent(self):
+        ret = {}
+
+        for field in self._fields:
+            ret[field.name] = field.json_encode(getattr(self, field.name))
+
+        return ret
+
+
 if __name__ == "__main__":
 
     class test1(Loadable):

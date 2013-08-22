@@ -19,7 +19,6 @@ class TestLoadable(unittest.TestCase):
         self.assertEquals(basic(foo=8).foo, 8)
         self.assertEquals(basic.load({'foo': 7}).foo, 7)
 
-
         self.assertRaises(exceptions.ValidationError, basic, 11)
         self.assertRaises(exceptions.ValidationError, basic, foo=-1)
         self.assertRaises(exceptions.ValidationError, basic.load, {'foo': 11})
@@ -30,4 +29,6 @@ class TestLoadable(unittest.TestCase):
             bar = IntField(default=1)
 
         self.assertRaises(TypeError, c2)
-        self.assertRaises(exceptions.LoadError,c2.load,{})
+        self.assertRaises(exceptions.LoadError, c2.load, {})
+
+        self.assertEquals( {'foo': 42, 'bar': 1}, c2(foo=42).json_equivalent())
